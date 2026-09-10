@@ -374,18 +374,22 @@
   .field input:focus{ border-color:var(--navy-ink); }
   .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
-  .age-pills{ display:flex; gap:8px; flex-wrap:wrap; }
-  .age-pill{
-    border:1.5px solid var(--border);
+  .field select{
     background:var(--surface);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:12px 13px;
+    font-size:14.5px;
     color:var(--text);
-    border-radius:100px;
-    padding:9px 15px;
-    font-size:13px;
-    font-weight:600;
-    cursor:pointer;
+    font-family:inherit;
+    appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235C6B78' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    background-size:18px;
+    padding-right:36px;
   }
-  .age-pill.is-selected{ border-color:var(--red); background:color-mix(in srgb, var(--red) 8%, var(--surface)); color:var(--red-strong); }
+  .field select:focus{ border-color:var(--navy-ink); }
 
   /* confirmation */
   .confirm{
@@ -530,12 +534,11 @@
         </div>
       </div>
       <div class="field">
-        <label>Fascia d&rsquo;età</label>
-        <div class="age-pills" id="age-pills">
-          <button type="button" class="age-pill" data-age="18-25">18–25</button>
-          <button type="button" class="age-pill" data-age="26-40">26–40</button>
-          <button type="button" class="age-pill" data-age="40+">40+</button>
-        </div>
+        <label for="f-eta">Età</label>
+        <select id="f-eta" name="eta" required>
+          <option value="" disabled selected>Seleziona la tua età</option>
+          <option value="&lt;17">Meno di 17</option>
+        </select>
       </div>
       <div class="field">
         <label for="f-email">Email</label>
@@ -612,7 +615,7 @@
     }
   };
 
-  var state = { loc:null, day:null, actIndex:null, age:null };
+  var state = { loc:null, day:null, actIndex:null };
 
   var stepper = document.getElementById("stepper");
   var stepLocation = document.getElementById("step-location");
@@ -734,15 +737,16 @@
     }
   });
 
-  // Step 3 — age pills
-  document.getElementById("age-pills").addEventListener("click", function(e){
-    var pill = e.target.closest(".age-pill");
-    if(!pill) return;
-    state.age = pill.dataset.age;
-    Array.prototype.forEach.call(document.querySelectorAll(".age-pill"), function(p){
-      p.classList.toggle("is-selected", p === pill);
-    });
-  });
+  // Step 3 — età: <17, poi 18 a salire
+  (function populateAges(){
+    var select = document.getElementById("f-eta");
+    for(var a = 18; a <= 90; a++){
+      var opt = document.createElement("option");
+      opt.value = String(a);
+      opt.textContent = String(a);
+      select.appendChild(opt);
+    }
+  })();
 
   // Back links
   document.body.addEventListener("click", function(e){
@@ -774,9 +778,8 @@
 
   // Restart
   document.getElementById("restart").addEventListener("click", function(){
-    state = { loc:null, day:null, actIndex:null, age:null };
+    state = { loc:null, day:null, actIndex:null };
     document.getElementById("booking-form").reset();
-    Array.prototype.forEach.call(document.querySelectorAll(".age-pill"), function(p){ p.classList.remove("is-selected"); });
     goTo(1);
   });
 

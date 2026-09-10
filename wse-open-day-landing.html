@@ -1,0 +1,785 @@
+<title>Prenota il Tuo Posto</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#F4F7F8;
+    --surface:#FFFFFF;
+    --surface-2:#EBF0F3;
+    --surface-3:#E2E9ED;
+    --navy:#123356;
+    --navy-ink:#123356;
+    --red:#E13A2E;
+    --red-strong:#C22C22;
+    --text:#1B2733;
+    --text-muted:#5C6B78;
+    --border:#DCE3E8;
+    --success-bg:#EAF5EE;
+    --success-text:#1F7A43;
+    --focus:#2E6BE0;
+    --shadow: 0 16px 32px -20px rgba(18,51,86,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1620;
+      --surface:#16202B;
+      --surface-2:#1C2733;
+      --surface-3:#243140;
+      --navy:#DCE8F5;
+      --navy-ink:#9FC1E8;
+      --red:#FF7A63;
+      --red-strong:#FF9482;
+      --text:#E7EDF2;
+      --text-muted:#93A4B3;
+      --border:#2B3946;
+      --success-bg:#153323;
+      --success-text:#6CD79A;
+      --focus:#6FA0FF;
+      --shadow: 0 16px 32px -20px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1620;
+    --surface:#16202B;
+    --surface-2:#1C2733;
+    --surface-3:#243140;
+    --navy:#DCE8F5;
+    --navy-ink:#9FC1E8;
+    --red:#FF7A63;
+    --red-strong:#FF9482;
+    --text:#E7EDF2;
+    --text-muted:#93A4B3;
+    --border:#2B3946;
+    --success-bg:#153323;
+    --success-text:#6CD79A;
+    --focus:#6FA0FF;
+    --shadow: 0 16px 32px -20px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+    min-height:100vh;
+  }
+  h1,h2,h3{font-family:"Poppins","Inter",sans-serif; margin:0;}
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+
+  .shell{
+    max-width:640px;
+    margin:0 auto;
+    padding:22px 20px 64px;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+
+  /* header / brand */
+  .brandbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .brand svg{width:26px;height:26px;flex-shrink:0;}
+  .brand span{
+    font-family:"Poppins",sans-serif;
+    font-weight:700;
+    font-size:14.5px;
+    color:var(--navy-ink);
+    letter-spacing:-.01em;
+  }
+  .event-tag{
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--red);
+    background:color-mix(in srgb, var(--red) 12%, transparent);
+    padding:5px 10px;
+    border-radius:100px;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+
+  /* stepper */
+  .stepper{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .stepper .item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1;
+  }
+  .stepper .dot{
+    width:26px;height:26px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:700;
+    background:var(--surface-2);
+    color:var(--text-muted);
+    border:1px solid var(--border);
+    flex-shrink:0;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .stepper .label{
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--text-muted);
+    white-space:nowrap;
+  }
+  .stepper .bar{
+    flex:1;
+    height:2px;
+    background:var(--border);
+    border-radius:2px;
+  }
+  .stepper .item.is-done .dot{ background:var(--navy); border-color:var(--navy); color:var(--surface); }
+  .stepper .item.is-done .label{ color:var(--text); }
+  .stepper .item.is-current .dot{ background:var(--red); border-color:var(--red); color:#fff; }
+  .stepper .item.is-current .label{ color:var(--text); }
+  .stepper .item.is-done + .item .bar{ background:var(--navy); }
+
+  /* generic step heading */
+  .step-head{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .step-head h1{
+    font-size:22px;
+    font-weight:700;
+    color:var(--navy-ink);
+    text-wrap:balance;
+  }
+  .step-head p{
+    margin:0;
+    font-size:14px;
+    color:var(--text-muted);
+    line-height:1.5;
+  }
+
+  .back-link{
+    align-self:flex-start;
+    background:none;
+    border:none;
+    color:var(--text-muted);
+    font-size:13px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+    padding:4px 2px;
+  }
+  .back-link:hover{ color:var(--text); }
+
+  /* step 1 — location cards */
+  .location-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+  @media (min-width:520px){
+    .location-grid{ grid-template-columns:1fr 1fr; }
+  }
+  .loc-card{
+    text-align:left;
+    background:var(--surface);
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  }
+  .loc-card:hover{ border-color:var(--navy-ink); box-shadow:var(--shadow); transform:translateY(-1px); }
+  .loc-card .pin{
+    width:34px;height:34px;
+    border-radius:10px;
+    background:var(--surface-2);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--navy-ink);
+  }
+  .loc-card h3{ font-size:16.5px; font-weight:700; color:var(--text); }
+  .loc-card .addr{ font-size:13px; color:var(--text-muted); line-height:1.4; }
+  .loc-card .go{
+    margin-top:2px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--red);
+  }
+
+  /* step 2 — day tabs */
+  .day-tabs{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:8px;
+  }
+  .day-tab{
+    background:var(--surface);
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    padding:10px 8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    cursor:pointer;
+  }
+  .day-tab .dow{ font-size:11.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.03em; }
+  .day-tab .num{ font-family:"Poppins",sans-serif; font-size:19px; font-weight:700; color:var(--text); }
+  .day-tab .count{ font-size:10.5px; color:var(--text-muted); }
+  .day-tab.is-active{ border-color:var(--red); background:color-mix(in srgb, var(--red) 7%, var(--surface)); }
+  .day-tab.is-active .num{ color:var(--red-strong); }
+  .day-tab.is-active .dow{ color:var(--red-strong); }
+
+  /* step 2 — activity cards */
+  .activity-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .act-card{
+    position:relative;
+    text-align:left;
+    background:var(--surface);
+    border:1.5px solid var(--border);
+    border-radius:12px;
+    padding:14px 16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    transition:border-color .15s ease, background .15s ease;
+    width:100%;
+  }
+  .act-card:hover{ border-color:var(--navy-ink); }
+  .act-card.is-selected{
+    border-color:var(--red);
+    background:color-mix(in srgb, var(--red) 6%, var(--surface));
+  }
+  .act-card .time{
+    font-family:"Poppins",sans-serif;
+    font-weight:700;
+    font-size:14px;
+    color:var(--navy-ink);
+    background:var(--surface-2);
+    border-radius:8px;
+    padding:8px 10px;
+    min-width:56px;
+    text-align:center;
+    flex-shrink:0;
+    font-variant-numeric:tabular-nums;
+  }
+  .act-card .info{ flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .act-card .title{ font-size:14.5px; font-weight:700; color:var(--text); }
+  .act-card .meta{ font-size:12.5px; color:var(--text-muted); }
+  .act-card .check{
+    width:20px;height:20px;
+    border-radius:50%;
+    border:1.5px solid var(--border);
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .act-card.is-selected .check{ background:var(--red); border-color:var(--red); }
+  .act-card.is-selected .check svg{ display:block; }
+  .act-card .check svg{ display:none; width:12px;height:12px; }
+
+  .empty-note{
+    font-size:13px;
+    color:var(--text-muted);
+    padding:14px 2px;
+  }
+
+  .sticky-cta{
+    position:sticky;
+    bottom:14px;
+    display:flex;
+    justify-content:center;
+    padding-top:6px;
+  }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    border:none;
+    border-radius:10px;
+    font-weight:700;
+    font-size:14.5px;
+    padding:14px 22px;
+    cursor:pointer;
+    transition:transform .1s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary{
+    background:var(--red);
+    color:#fff;
+    box-shadow:0 10px 24px -10px color-mix(in srgb, var(--red) 70%, transparent);
+    width:100%;
+  }
+  .btn-primary:hover{ background:var(--red-strong); }
+  .btn-primary:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+
+  /* step 3 — form */
+  .summary-chip{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--surface-2);
+    border-radius:12px;
+    padding:12px 14px;
+  }
+  .summary-chip .time{
+    font-family:"Poppins",sans-serif;
+    font-weight:700;
+    font-size:13px;
+    color:#fff;
+    background:var(--navy);
+    border-radius:8px;
+    padding:7px 9px;
+    flex-shrink:0;
+    text-align:center;
+    line-height:1.2;
+  }
+  .summary-chip .time small{ display:block; font-size:9.5px; font-weight:600; opacity:.8; }
+  .summary-chip .txt{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+  .summary-chip .txt strong{ font-size:13.5px; color:var(--text); }
+  .summary-chip .txt span{ font-size:12px; color:var(--text-muted); }
+
+  form{ display:flex; flex-direction:column; gap:14px; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field label{ font-size:12.5px; font-weight:600; color:var(--text-muted); }
+  .field input{
+    background:var(--surface);
+    border:1.5px solid var(--border);
+    border-radius:10px;
+    padding:12px 13px;
+    font-size:14.5px;
+    color:var(--text);
+    font-family:inherit;
+  }
+  .field input::placeholder{ color:var(--text-muted); opacity:.6; }
+  .field input:focus{ border-color:var(--navy-ink); }
+  .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .age-pills{ display:flex; gap:8px; flex-wrap:wrap; }
+  .age-pill{
+    border:1.5px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    border-radius:100px;
+    padding:9px 15px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+  }
+  .age-pill.is-selected{ border-color:var(--red); background:color-mix(in srgb, var(--red) 8%, var(--surface)); color:var(--red-strong); }
+
+  /* confirmation */
+  .confirm{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:16px;
+    padding:12px 0 8px;
+  }
+  .confirm .check-badge{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:var(--success-bg);
+    color:var(--success-text);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .confirm h1{ font-size:23px; color:var(--navy-ink); }
+  .confirm .sub{ font-size:14px; color:var(--text-muted); max-width:360px; line-height:1.5; }
+  .confirm-card{
+    width:100%;
+    background:var(--surface);
+    border:1.5px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    text-align:left;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-top:6px;
+  }
+  .confirm-card .row{ display:flex; justify-content:space-between; gap:10px; font-size:13.5px; }
+  .confirm-card .row .k{ color:var(--text-muted); flex-shrink:0; }
+  .confirm-card .row .v{ color:var(--text); font-weight:600; text-align:right; }
+  .confirm-card hr{ border:none; border-top:1px solid var(--border); margin:0; }
+  .confirm .fineprint{ font-size:12.5px; color:var(--text-muted); margin-top:4px; }
+  .restart{
+    margin-top:10px;
+    background:none;
+    border:none;
+    color:var(--navy-ink);
+    font-weight:600;
+    font-size:13px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
+  [hidden]{ display:none !important; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+
+<div class="shell">
+  <div class="brandbar">
+    <div class="brand">
+      <svg viewBox="0 0 54 54" fill="none">
+        <rect x="4" y="9" width="11" height="27" rx="5.5" fill="var(--red)"/>
+        <rect x="13" y="4" width="36" height="29" rx="9" fill="none" stroke="var(--navy)" stroke-width="5"/>
+        <path d="M18 25 L18 39 L27 33" fill="none" stroke="var(--navy)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+      <span>Wall Street English</span>
+    </div>
+    <span class="event-tag">Open Days · 24–26 Set</span>
+  </div>
+
+  <nav class="stepper" id="stepper" aria-label="Avanzamento prenotazione">
+    <div class="item" data-step="1">
+      <div class="dot">1</div>
+      <span class="label">Sede</span>
+      <div class="bar"></div>
+    </div>
+    <div class="item" data-step="2">
+      <div class="dot">2</div>
+      <span class="label">Attività</span>
+      <div class="bar"></div>
+    </div>
+    <div class="item" data-step="3">
+      <div class="dot">3</div>
+      <span class="label">I tuoi dati</span>
+    </div>
+  </nav>
+
+  <!-- STEP 1 -->
+  <section id="step-location">
+    <div class="step-head">
+      <h1>Dove vuoi venire?</h1>
+      <p>Scegli il centro Wall Street English più comodo per te. Gli Open Days sono giovedì 24, venerdì 25 e sabato 26 settembre.</p>
+    </div>
+    <div class="location-grid" style="margin-top:18px;">
+      <button class="loc-card" data-loc="catania">
+        <span class="pin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </span>
+        <h3>Catania</h3>
+        <span class="addr">Corso delle Province 55, Catania</span>
+        <span class="go">Scegli Catania →</span>
+      </button>
+      <button class="loc-card" data-loc="portali">
+        <span class="pin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </span>
+        <h3>I Portali</h3>
+        <span class="addr">Sopra Unieuro, S.G. La Punta (CT)</span>
+        <span class="go">Scegli I Portali →</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section id="step-activity" hidden>
+    <button class="back-link" data-back="1">&larr; Cambia sede</button>
+    <div class="step-head" style="margin-top:10px;">
+      <h1 id="activity-title">Cosa vuoi provare?</h1>
+      <p>Tre giorni, un&rsquo;attività a testa. Scegli il giorno e poi quella che ti incuriosisce di più.</p>
+    </div>
+    <div class="day-tabs" id="day-tabs" style="margin-top:16px;"></div>
+    <div class="activity-list" id="activity-list" style="margin-top:14px;"></div>
+    <div class="sticky-cta">
+      <button class="btn btn-primary" id="to-step3" disabled>Continua →</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section id="step-form" hidden>
+    <button class="back-link" data-back="2">&larr; Cambia attività</button>
+    <div class="step-head" style="margin-top:10px;">
+      <h1>Prenota il tuo posto</h1>
+      <p>Ultimo passo: lasciaci i tuoi dati e il posto è tuo.</p>
+    </div>
+    <div class="summary-chip" id="summary-chip" style="margin-top:16px;"></div>
+    <form id="booking-form" style="margin-top:4px;">
+      <div class="field-row">
+        <div class="field">
+          <label for="f-nome">Nome</label>
+          <input id="f-nome" name="nome" type="text" placeholder="Es. Giulia" required>
+        </div>
+        <div class="field">
+          <label for="f-cognome">Cognome</label>
+          <input id="f-cognome" name="cognome" type="text" placeholder="Es. Russo" required>
+        </div>
+      </div>
+      <div class="field">
+        <label>Fascia d&rsquo;età</label>
+        <div class="age-pills" id="age-pills">
+          <button type="button" class="age-pill" data-age="18-25">18–25</button>
+          <button type="button" class="age-pill" data-age="26-40">26–40</button>
+          <button type="button" class="age-pill" data-age="40+">40+</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-email">Email</label>
+        <input id="f-email" name="email" type="email" placeholder="nome@email.com" required>
+      </div>
+      <div class="field">
+        <label for="f-telefono">Telefono</label>
+        <input id="f-telefono" name="telefono" type="tel" placeholder="333 1234567" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:8px;">Prenota il mio posto</button>
+    </form>
+  </section>
+
+  <!-- CONFIRMATION -->
+  <section id="step-confirm" hidden>
+    <div class="confirm">
+      <div class="check-badge">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <h1 id="confirm-title">Ci vediamo agli Open Days!</h1>
+      <p class="sub">Il tuo posto è prenotato.</p>
+      <div class="confirm-card" id="confirm-card"></div>
+      <p class="fineprint">Ti invieremo anche la conferma ai contatti che ci hai lasciato.</p>
+      <button class="restart" id="restart">Prenota un altro posto</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  var LOCATIONS = {
+    catania: { name: "Wall Street English Catania", short:"Catania", addr: "Corso delle Province 55, Catania" },
+    portali: { name: "Wall Street English I Portali", short:"I Portali", addr: "S.G. La Punta (CT) — sopra Unieuro" }
+  };
+
+  var DAYS = [
+    { id:"24", dow:"Gio", num:"24", label:"Giovedì 24 settembre" },
+    { id:"25", dow:"Ven", num:"25", label:"Venerdì 25 settembre" },
+    { id:"26", dow:"Sab", num:"26", label:"Sabato 26 settembre" }
+  ];
+
+  var SCHEDULE = {
+    catania: {
+      "24": [
+        { time:"17:30", title:"Travel", meta:"A1/A2" },
+        { time:"18:30", title:"Virtual Museum Tour: MoMA", meta:"All levels" },
+        { time:"19:30", title:"Music and Memories", meta:"B1/B2" }
+      ],
+      "25": [
+        { time:"17:30", title:"Working & Studying Abroad", meta:"All levels" },
+        { time:"18:30", title:"AI Workshop", meta:"B2/C1+" },
+        { time:"19:30", title:"Game Night", meta:"All levels" }
+      ],
+      "26": [
+        { time:"17:00", title:"Medical English", meta:"All levels" },
+        { time:"18:00", title:"Pronunciation Lab", meta:"All levels" },
+        { time:"19:00", title:"Movies & Pop Culture", meta:"B1/B2+" }
+      ]
+    },
+    portali: {
+      "24": [
+        { time:"18:30", title:"Travel Hacks", meta:"A1/A2" },
+        { time:"19:30", title:"Music and Memories", meta:"B1/B2" }
+      ],
+      "25": [
+        { time:"18:30", title:"Virtual Museum Tour: MoMA", meta:"All levels" },
+        { time:"19:30", title:"Dealing with Emergencies", meta:"All levels" }
+      ],
+      "26": [
+        { time:"10:00", title:"Saturday Chat Conversation", meta:"A2/B1" },
+        { time:"18:00", title:"Saturday Chat Conversation", meta:"B2/C1+" },
+        { time:"19:00", title:"Saturday Chat Conversation", meta:"A2/B1" }
+      ]
+    }
+  };
+
+  var state = { loc:null, day:null, actIndex:null, age:null };
+
+  var stepper = document.getElementById("stepper");
+  var stepLocation = document.getElementById("step-location");
+  var stepActivity = document.getElementById("step-activity");
+  var stepForm = document.getElementById("step-form");
+  var stepConfirm = document.getElementById("step-confirm");
+
+  function setStepper(n){
+    stepper.hidden = n > 3;
+    Array.prototype.forEach.call(stepper.querySelectorAll(".item"), function(el){
+      var s = parseInt(el.dataset.step, 10);
+      el.classList.toggle("is-done", s < n);
+      el.classList.toggle("is-current", s === n);
+    });
+  }
+
+  function goTo(step){
+    stepLocation.hidden = step !== 1;
+    stepActivity.hidden = step !== 2;
+    stepForm.hidden = step !== 3;
+    stepConfirm.hidden = step !== 4;
+    setStepper(step);
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  function currentActivities(){
+    if(!state.loc || !state.day) return [];
+    return SCHEDULE[state.loc][state.day] || [];
+  }
+
+  function renderDayTabs(){
+    var loc = LOCATIONS[state.loc];
+    var wrap = document.getElementById("day-tabs");
+    wrap.innerHTML = "";
+    DAYS.forEach(function(d){
+      var count = (SCHEDULE[state.loc][d.id] || []).length;
+      var tab = document.createElement("button");
+      tab.type = "button";
+      tab.className = "day-tab" + (state.day === d.id ? " is-active" : "");
+      tab.dataset.day = d.id;
+      tab.innerHTML =
+        '<span class="dow">' + d.dow + '</span>' +
+        '<span class="num">' + d.num + '</span>' +
+        '<span class="count">' + count + ' attività' + '</span>';
+      wrap.appendChild(tab);
+    });
+  }
+
+  function renderActivities(){
+    var loc = LOCATIONS[state.loc];
+    document.getElementById("activity-title").textContent = "Cosa vuoi provare a " + loc.short + "?";
+    renderDayTabs();
+    var list = document.getElementById("activity-list");
+    list.innerHTML = "";
+    var acts = currentActivities();
+    if(acts.length === 0){
+      var p = document.createElement("p");
+      p.className = "empty-note";
+      p.textContent = "Nessuna attività programmata questo giorno in questa sede.";
+      list.appendChild(p);
+    }
+    acts.forEach(function(act, i){
+      var card = document.createElement("button");
+      card.type = "button";
+      card.className = "act-card" + (state.actIndex === i ? " is-selected" : "");
+      card.dataset.idx = i;
+      card.innerHTML =
+        '<span class="time">' + act.time + '</span>' +
+        '<span class="info"><span class="title">' + act.title + '</span><span class="meta">' + act.meta + '</span></span>' +
+        '<span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>';
+      list.appendChild(card);
+    });
+    document.getElementById("to-step3").disabled = state.actIndex === null;
+  }
+
+  function selectedActivity(){
+    var acts = currentActivities();
+    return state.actIndex !== null ? acts[state.actIndex] : null;
+  }
+
+  function renderSummary(){
+    var loc = LOCATIONS[state.loc];
+    var day = DAYS.filter(function(d){ return d.id === state.day; })[0];
+    var act = selectedActivity();
+    document.getElementById("summary-chip").innerHTML =
+      '<span class="time">' + day.dow + ' ' + day.num + '<small>' + act.time + '</small></span>' +
+      '<span class="txt"><strong>' + act.title + '</strong><span>' + loc.name + '</span></span>';
+  }
+
+  // Step 1
+  stepLocation.addEventListener("click", function(e){
+    var card = e.target.closest(".loc-card");
+    if(!card) return;
+    state.loc = card.dataset.loc;
+    state.day = "24";
+    state.actIndex = null;
+    goTo(2);
+    renderActivities();
+  });
+
+  // Step 2 — day tabs + activity cards
+  stepActivity.addEventListener("click", function(e){
+    var tab = e.target.closest(".day-tab");
+    if(tab){
+      state.day = tab.dataset.day;
+      state.actIndex = null;
+      renderActivities();
+      return;
+    }
+    var card = e.target.closest(".act-card");
+    if(card){
+      state.actIndex = parseInt(card.dataset.idx, 10);
+      renderActivities();
+      return;
+    }
+    if(e.target.id === "to-step3" && state.actIndex !== null){
+      goTo(3);
+      renderSummary();
+    }
+  });
+
+  // Step 3 — age pills
+  document.getElementById("age-pills").addEventListener("click", function(e){
+    var pill = e.target.closest(".age-pill");
+    if(!pill) return;
+    state.age = pill.dataset.age;
+    Array.prototype.forEach.call(document.querySelectorAll(".age-pill"), function(p){
+      p.classList.toggle("is-selected", p === pill);
+    });
+  });
+
+  // Back links
+  document.body.addEventListener("click", function(e){
+    var back = e.target.closest("[data-back]");
+    if(!back) return;
+    goTo(parseInt(back.dataset.back, 10));
+  });
+
+  // Submit
+  document.getElementById("booking-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var loc = LOCATIONS[state.loc];
+    var day = DAYS.filter(function(d){ return d.id === state.day; })[0];
+    var act = selectedActivity();
+    var nome = document.getElementById("f-nome").value.trim();
+    var cognome = document.getElementById("f-cognome").value.trim();
+    document.getElementById("confirm-title").textContent = "Ci vediamo " + day.label.toLowerCase() + "!";
+    document.getElementById("confirm-card").innerHTML =
+      '<div class="row"><span class="k">Sede</span><span class="v">' + loc.name + '</span></div>' +
+      '<div class="row"><span class="k">Indirizzo</span><span class="v">' + loc.addr + '</span></div>' +
+      '<hr>' +
+      '<div class="row"><span class="k">Giorno</span><span class="v">' + day.label + '</span></div>' +
+      '<div class="row"><span class="k">Orario</span><span class="v">' + act.time + '</span></div>' +
+      '<div class="row"><span class="k">Attività</span><span class="v">' + act.title + ' (' + act.meta + ')</span></div>' +
+      '<hr>' +
+      '<div class="row"><span class="k">Prenotato da</span><span class="v">' + (nome + " " + cognome).trim() + '</span></div>';
+    goTo(4);
+  });
+
+  // Restart
+  document.getElementById("restart").addEventListener("click", function(){
+    state = { loc:null, day:null, actIndex:null, age:null };
+    document.getElementById("booking-form").reset();
+    Array.prototype.forEach.call(document.querySelectorAll(".age-pill"), function(p){ p.classList.remove("is-selected"); });
+    goTo(1);
+  });
+
+  goTo(1);
+})();
+</script>

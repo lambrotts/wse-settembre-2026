@@ -588,6 +588,32 @@
 
 <script>
 (function(){
+  // Ogni prenotazione viene inviata anche a questo Google Form (che scrive
+  // su un Google Sheet e manda una notifica email) — è il "database" dei lead.
+  var GOOGLE_FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSdWchmfpPqbPeWaz235ZIz-8so70yXcAab7JSLnO1gEqiGJWg/formResponse";
+  var GOOGLE_FORM_ENTRIES = {
+    nome: "entry.1554751312",
+    cognome: "entry.1553603128",
+    eta: "entry.1973336545",
+    email: "entry.1682926604",
+    telefono: "entry.611253663",
+    sede: "entry.1333182652",
+    giorno: "entry.1759968894",
+    orario: "entry.517346058",
+    attivita: "entry.1940405593"
+  };
+
+  function sendToGoogleForm(data){
+    var params = new URLSearchParams();
+    Object.keys(GOOGLE_FORM_ENTRIES).forEach(function(key){
+      params.append(GOOGLE_FORM_ENTRIES[key], data[key] || "");
+    });
+    // no-cors: la risposta è opaca (non possiamo leggere se è andata a buon
+    // fine), ma è l'unico modo per inviare dati a Google Forms da un sito
+    // statico senza backend proprio. È un invio "best effort".
+    fetch(GOOGLE_FORM_ACTION, { method: "POST", mode: "no-cors", body: params }).catch(function(){});
+  }
+
   var LOCATIONS = {
     catania: { name: "Wall Street English Catania", short:"Catania", addr: "Corso delle Province 55, Catania" },
     portali: { name: "Wall Street English I Portali", short:"I Portali", addr: "S.G. La Punta (CT) — sopra Unieuro" }
@@ -785,6 +811,22 @@
     var act = selectedActivity();
     var nome = document.getElementById("f-nome").value.trim();
     var cognome = document.getElementById("f-cognome").value.trim();
+    var eta = document.getElementById("f-eta").value;
+    var email = document.getElementById("f-email").value.trim();
+    var telefono = document.getElementById("f-telefono").value.trim();
+
+    sendToGoogleForm({
+      nome: nome,
+      cognome: cognome,
+      eta: eta,
+      email: email,
+      telefono: telefono,
+      sede: loc.name,
+      giorno: day.label,
+      orario: act.time,
+      attivita: act.title + " (" + act.meta + ")"
+    });
+
     document.getElementById("confirm-title").textContent = "Ci vediamo " + day.label.toLowerCase() + "!";
     document.getElementById("confirm-card").innerHTML =
       '<div class="row"><span class="k">Sede</span><span class="v">' + loc.name + '</span></div>' +
